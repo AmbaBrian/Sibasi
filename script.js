@@ -13,6 +13,8 @@
     const todoInput = document.getElementById('todoInput');
     const addTodoBtn = document.getElementById('addTodoBtn');
     const todoList = document.getElementById('todoList');
+    const emptyTodoPlaceholder = document.getElementById('emptyTodoPlaceholder');
+    const emptyAddTaskBtn = document.getElementById('emptyAddTaskBtn');
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const dontAskAgain = document.getElementById('dontAskAgain');
     const confirmDeleteBtn = document.getElementById('confirmDelete');
@@ -20,6 +22,20 @@
     // Variables
     let currentTaskIndex = null;
     let dontAskAgainChecked = false;
+    
+    // Function to check if todo list is empty and show/hide placeholder
+    function updateEmptyState() {
+        if (todoList.children.length === 0) {
+            emptyTodoPlaceholder.classList.remove('hidden');
+            todoList.classList.add('hidden');
+        } else {
+            emptyTodoPlaceholder.classList.add('hidden');
+            todoList.classList.remove('hidden');
+        }
+    }
+    
+    // Initial check for empty state
+    updateEmptyState();
     
     // Validation functions
     function validateEmail() {
@@ -114,19 +130,6 @@
         cardsLink.classList.add('active');
     });
     
-    // Todo List Functionality
-    function addSampleTasks() {
-        const sampleTasks = [
-            'Complete project proposal',
-            'Review meeting notes',
-            'Send follow-up emails'
-        ];
-        
-        sampleTasks.forEach(task => {
-            addTask(task);
-        });
-    }
-    
     function addTask(text) {
         const todoItem = document.createElement('div');
         todoItem.className = 'todo-item';
@@ -159,6 +162,9 @@
         todoItem.appendChild(todoActions);
         
         todoList.appendChild(todoItem);
+        
+        // Update empty state after adding task
+        updateEmptyState();
     }
     
     function editTask(todoItem) {
@@ -246,6 +252,8 @@
         if (dontAskAgainChecked) {
             // Delete without confirmation
             todoItem.remove();
+            // Update empty state after removing task
+            updateEmptyState();
         } else {
             // Show confirmation modal
             currentTaskIndex = Array.from(todoList.children).indexOf(todoItem);
@@ -260,6 +268,11 @@
             addTask(text);
             todoInput.value = '';
         }
+    });
+    
+    // Empty state "Add Your First Task" button
+    emptyAddTaskBtn.addEventListener('click', function() {
+        todoInput.focus();
     });
     
     // Enter key on input
@@ -278,6 +291,8 @@
         const todoItems = todoList.querySelectorAll('.todo-item');
         if (currentTaskIndex !== null && todoItems[currentTaskIndex]) {
             todoItems[currentTaskIndex].remove();
+            // Update empty state after removing task
+            updateEmptyState();
         }
         
         // Update don't ask again preference
